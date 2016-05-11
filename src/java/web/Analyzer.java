@@ -5,6 +5,7 @@
  */
 package web;
 
+import helper.ProfanityData;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -31,40 +33,13 @@ import javax.ws.rs.core.MediaType;
  *
  * @author robin
  */
-@Path("analyzer")
+@Path("/analyzer")
 public class Analyzer {
 
     @Context
     private UriInfo context;
 
-    private List<String> profanityList;
-    /*
-    @PostConstruct
-    public void init() {
-	FileInputStream fis = null;
-        try {
-            profanityList = new ArrayList<>();
-            
-            fis = new FileInputStream("/resources/profanity_dutch.txt");
-            //Construct BufferedReader from InputStreamReader
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-                profanityList.add(line);
-            }   br.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Analyzer.class.getName()).log(Level.SEVERE, null, ex);    
-        } catch (IOException ex) {
-            Logger.getLogger(Analyzer.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                fis.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Analyzer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }*/
+    private ProfanityData data = new ProfanityData();    
     
     /**
      * Creates a new instance of GenericResource
@@ -73,44 +48,16 @@ public class Analyzer {
     }
 
     /**
-    * Retrieves representation of an instance of helloWorld.HelloWorld
-    * @return an instance of java.lang.String
-    */
-    @GET
-    @Produces("text/plain")
-    public String getHtml() {
-        return "testing rest";
-    }
-
+     * analyze the text, returns a score.
+     * @param text
+     * @return 
+     */
     @POST
-    @Produces("text/plain")
+    @Produces("application/json")
     @Consumes("text/plain")
     public String analyze(String text) {
         // Prepare string:
-        text = text.trim();
-        String[] words = text.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
-        Double score = 0.0;
-        for (String word : words) {
-            /*if (profanityList.contains(word)) {
-                score += 1/text.length();
-            }*/
-            System.out.println(word + "!");
-            if (word.equals("hoer")) {
-                System.out.println("Equalled");
-                score += 1.0/text.length();
-                System.out.println(score);
-            }
-        }
-        return "Analyze: " + text + score.toString();
-    }
-    /**
-     * PUT method for updating or creating an instance of Analyzer
-     * @param content representation for the resource
-     */
-    @PUT
-    @Consumes(MediaType.TEXT_PLAIN)
-    public void putText(String content) {
-    }
-    
-    
+        Double score = data.getScore(text);
+        return "{\"value\":" + score.toString() + "}";
+    }    
 }

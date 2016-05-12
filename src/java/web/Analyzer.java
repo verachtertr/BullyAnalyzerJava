@@ -5,28 +5,18 @@
  */
 package web;
 
+import business.ProfanityService;
 import helper.ProfanityData;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
+import persistence.Profanity;
 
 /**
  * REST Web Service
@@ -38,15 +28,31 @@ public class Analyzer {
 
     @Context
     private UriInfo context;
-
-    private ProfanityData data = new ProfanityData();    
     
+    @EJB
+    private ProfanityService serv;
+    
+    private ProfanityData pd = new ProfanityData();
+
     /**
      * Creates a new instance of GenericResource
      */
     public Analyzer() {
     }
+    
+    @PostConstruct 
+    public void init() {
+        if (serv.isEmpty()) {
+            // Empty Database -> import default profaniets_dutch.txt
+            List<String> profanities = pd.getList();
+            for (String p : profanities) {
+                Profanity pr = new Profanity(p);
+                serv.addTerm((pr));
+            }
+        }
+    }
 
+    
     /**
      * analyze the text, returns a score.
      * @param text
@@ -56,8 +62,7 @@ public class Analyzer {
     @Produces("application/json")
     @Consumes("text/plain")
     public String analyze(String text) {
-        // Prepare string:
-        Double score = data.getScore(text);
+        Double score = serv.getScore(text);
         return "{\"value\":" + score.toString() + "}";
     }    
 }

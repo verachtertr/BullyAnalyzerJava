@@ -4939,4 +4939,8 @@ public class ProfanityData {
 
     }
     
+    public List<String> getList() {
+        return this.profanitiesList;
+    }
+    
 }

@@ -5,6 +5,7 @@
  */
 package business;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -42,8 +43,28 @@ public class ProfanityService {
                 score += 1.0/words.length;
             }
         }
-        
         return score;
+    }
+    
+    public List<String> getProfanities(String text) {
+        
+        List<String> list = new ArrayList<>();
+        
+        // Prepare string:
+        text = text.trim();
+        String[] words = text.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
+        Double score = 0.0;
+        for (String word : words) {
+            System.out.println(word);
+            word = word.trim();
+            List<Profanity> matches = em.createNamedQuery("Profanities.find").setParameter("searchTerm", word).getResultList();
+            if (matches.size() > 0) {
+                System.out.println("Matched");
+                list.add(word);
+                //score += 1.0/words.length;
+            }
+        }
+        return list;    
     }
     
     public Boolean isEmpty() {

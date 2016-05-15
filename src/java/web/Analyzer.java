@@ -63,6 +63,22 @@ public class Analyzer {
     @Consumes("text/plain")
     public String analyze(String text) {
         Double score = serv.getScore(text);
-        return "{\"value\":" + score.toString() + "}";
+        List<String> profanities = serv.getProfanities(text);
+        String retString = "";
+        retString += "{\"value\":" + score.toString() +",\n";
+        retString += "\"profanities\": [";
+        Boolean initial = true;
+        for (String word : profanities) {
+            if (initial){
+                retString += word;
+            }
+            else {
+                retString += ", "+ word ;
+            }
+        }
+        
+        retString += "]";
+        retString += "}";
+        return retString;
     }    
 }

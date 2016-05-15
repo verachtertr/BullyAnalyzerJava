@@ -70,10 +70,10 @@ public class Analyzer {
         Boolean initial = true;
         for (String word : profanities) {
             if (initial){
-                retString += word;
+                retString += "\"" + word + "\"";
             }
             else {
-                retString += ", "+ word ;
+                retString += ", \""+ word + "\"";
             }
         }
         

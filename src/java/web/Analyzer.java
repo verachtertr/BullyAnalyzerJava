@@ -71,6 +71,7 @@ public class Analyzer {
         for (String word : profanities) {
             if (initial){
                 retString += "\"" + word + "\"";
+                initial = false;
             }
             else {
                 retString += ", \""+ word + "\"";

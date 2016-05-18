@@ -10,6 +10,7 @@ import helper.ProfanityData;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -28,6 +29,8 @@ public class Analyzer {
 
     @Context
     private UriInfo context;
+    
+    @Context private HttpServletResponse response;
     
     @EJB
     private ProfanityService serv;
@@ -62,6 +65,7 @@ public class Analyzer {
     @Produces("application/json")
     @Consumes("text/plain")
     public String analyze(String text) {
+        response.addHeader("Access-Control-Allow-Origin", "*");
         Double score = serv.getScore(text);
         List<String> profanities = serv.getProfanities(text);
         String retString = "";
